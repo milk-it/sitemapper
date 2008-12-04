@@ -6,8 +6,12 @@ module Sitemapper
     end
 
     def write!
+      # TODO: treat if the file already exist, and if it does, open and merge
+      # with the current routes
+
       file = File.open(File.join(Rails.root, 'public', 'sitemap.xml'), 'w')
       bld = Builder::XmlMarkup.new(:target => file, :indent => 2)
+      bld.instruct! :xml, :version => '1.0', :encoding => 'UTF-8'
       bld.urlset('xmlns' => 'http://www.sitemaps.org/schemas/sitemap/0.9') do
         @maps.each do |map|
           bld.url do
