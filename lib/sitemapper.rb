@@ -41,7 +41,8 @@ module Sitemapper
     end
 
     def named_route_with_sitemap(name, path, options = {})
-      Sitemapper.add_mapping("http://www.example.com/#{path}", Date.today, :monthly, 0.8)
+      uroot = ActionController::Base.relative_url_root rescue ActionController::AbstractRequest.relative_url_root
+      Sitemapper.add_mapping("#{uroot}#{path}", Date.today, :monthly, 0.8)
       named_route_without_sitemap(name, path, options)
     end
 
