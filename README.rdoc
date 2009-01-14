@@ -1,0 +1,23 @@
+= Sitemapper - Easy SEO engine
+
+Sitemapper will help you in various SEO techniques such as sitemap.xml
+auto generation.
+
+== Installation
+
+  You can install the development version with
+
+  % sudo gem sources -a http://gems.github.com # (you only need to do this once)
+  % sudo gem install milk-it-sitemapper
+
+  Or the release version with
+
+  % sudo gem install sitemapper
+
+
+== Example
+
+TODO: examples
+
+Copyright (c) 2008 Carlos Júnior, released under the MIT license
+Copyright (c) 2008 Milk-it Software House, released under the MIT license
