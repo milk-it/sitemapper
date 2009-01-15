@@ -2,6 +2,8 @@ module Sitemapper
   module Adapters
     module RailsAdapter
       module RoutesMapperExtension
+        include Sitemapper::Accessors
+
         def self.included(base)
           base.class_eval do
             alias_method_chain :named_route, :sitemap
@@ -30,8 +32,9 @@ module Sitemapper
         def map_if_possible(path, options)
           # Don't map dynamic URLs
           method = options[:conditions][:method] rescue :get
+          # TODO: extract options to map
           unless path =~ /[:*]/ || method != :get
-            Sitemapper::map.map_url(path, Date.today, :monthly, 0.8)
+            map_path(path)
           end
         end
       end

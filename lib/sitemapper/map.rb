@@ -1,5 +1,6 @@
 require 'rexml/document'
 require 'thread'
+require 'uri'
 
 module Sitemapper
   class Map
@@ -39,7 +40,7 @@ module Sitemapper
     # * <tt>priority</tt> the priority of the URL (0..1) [optional]
     #
     # See http://www.sitemaps.org/protocol.php
-    def map_url(loc, opts)
+    def map_url(loc, opts={})
       lastmod, changefreq, priority = extract_options(opts)
       @locker.synchronize do
         url = get_url(loc) || @builder.root.add_element('url')
@@ -56,8 +57,8 @@ module Sitemapper
     #
     # <tt>path</tt> is the path to be mapped
     # <tt>opts</tt> is a hash containing options for this url (see <tt>map_url</tt>)
-    def map_path(path, opts)
-      map_url(URL.join(Map.site_root, path), opts)
+    def map_path(path, opts={})
+      map_url(URI.join(Map.site_root, path), opts)
     end
 
     def map_urls #:nodoc:
@@ -93,7 +94,7 @@ module Sitemapper
       changefreq = opts.delete(:changefreq)
       priority = opts.delete(:priority)
 
-      lastmod, changefreq, priority
+      [lastmod, changefreq, priority]
     end
 
     # Return the Element for the given <tt>url</tt>

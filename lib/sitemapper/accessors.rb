@@ -1,10 +1,10 @@
 module Sitemapper
-  module Acessors
-    def map_url(url, opts)
+  module Accessors
+    def map_url(url, opts={})
       Sitemapper::map.map_url(url, opts)
     end
 
-    def map_path(path, opts)
+    def map_path(path, opts={})
       Sitemapper::map.map_path(path, opts)
     end
 
