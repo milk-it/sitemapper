@@ -65,7 +65,7 @@ You can also do it on your sweepers (which is a better choice)
 
 === Merb
 
-Sorry, we do not support Merb yet. (Acctualy, it will depend on the
+Sorry, we do not support Merb yet. (Actually, it will depend on the
 demand)
 
 === Other SEO techniques
