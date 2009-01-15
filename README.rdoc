@@ -7,17 +7,115 @@ auto generation.
 
   You can install the development version with
 
-  % sudo gem sources -a http://gems.github.com # (you only need to do this once)
-  % sudo gem install milk-it-sitemapper
+  % sudo gem install milk-it-sitemapper -s http://gems.github.com
 
   Or the release version with
 
   % sudo gem install sitemapper
 
 
-== Example
+== Examples
 
-TODO: examples
+=== Ruby On Rails
+
+Sitemapper will automagically generate a sitemap.xml file for you when
+your rails application start, this sitemap.xml will include all your
+URLs that Sitemapper consider 'static', for example:
+
+  map.todo '/to-do' # Sitemapper will consider this as static
+  map.articles '/articles/:year/:month' # Will be considered this dynamic
+  map.connect '*path' # Will be considered dynamic
+
+The generation of your sitemap.xml will happen on your application boot,
+but it won't delete any URL previous added (we hope to be able to do so
+very soon - a merge).
+
+In your application, you can use the accessors provided by Sitemapper to
+dynamically add URLs, for example, supose a blog app:
+
+  class ArticlesController < ApplicationController
+    ...
+    def create
+      # do all the creation stuff
+      map_url(article_url(@article)) # add the URL to your sitemap
+    end
+
+    def destroy
+      # do all the deletion stuff
+      unmap_url(article_url(@article))
+    end
+    ...
+  end
+
+You can also do it on your sweepers (which is a better choice)
+
+  class ArticleSweeper < ActionController::Caching::Sweeper
+    observe Article, Account
+
+    def after_create(record)
+      # expire everything you need
+      map_url(polymorphic_url(record))
+    end
+
+    def after_destroy(record)
+      # expire everything you need
+      map_url(polymorphic_url(record))
+    end
+  end
+
+=== Merb
+
+Sorry, we do not support Merb yet. (Acctualy, it will depend on the
+demand)
+
+=== Other SEO techniques
+
+With SEO, you'll have some view helpers to easily apply some SEO
+techniques to your website/webapp.
+
+In your application layout, just do it:
+
+  <head>
+      <%= title('My Personal Blog') %>
+      <%= page_meta %>
+  </head>
+
+And in your action views, you put this:
+
+  <% page(:title => 'Contact',
+    :desc => 'Here you'll can contact our customer support ...',
+    :keywords => 'contact, support, customer') %>
+
+In this case, the view will be rendered in this way:
+
+  <head>
+      <title>Contact :: My Personal Blog</title>
+      <meta name="description" content="Here you'll can contact our customer support ..." />
+      <meta name="keywords" content="contact, support, customer" />
+  </head>
+
+If you want to change the title separator, just do:
+
+    ...
+    <%= title('My Personal Blog', :separator => ' - ') %>
+    ...
+
+Or, you can als use any object that respond to title or name (for
+page title), short_description or description, tag_list or keywords.
+
+  <% page(@event) %>
+
+If you want to suggest any other SEO technique, suggest it on
+carlos@milk-it.net
+
+=== Hope you enjoy!
+
+== To do:
+
+ * Add sitemap options to routes
+ * Create separate files for dynamic and static routes (then, we'll can
+   delete all the static on startup)
+ * Write test code (sorry, I really didn't it)
 
 Copyright (c) 2008 Carlos Júnior, released under the MIT license
 Copyright (c) 2008 Milk-it Software House, released under the MIT license
