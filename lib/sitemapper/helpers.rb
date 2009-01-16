@@ -18,27 +18,30 @@ module Sitemapper
       @_title = defs.delete(:title)
       @_desc  = defs.delete(:desc)
       @_keys  = defs.delete(:keywords)
+      return nil # dummies safe!
     end
 
     def page_with_object(defs) # :nodoc:
       return page_without_object(defs) if defs.is_a?(Hash)
-      @_title = if defs.respond_to?(:title)
-        defs.title
-      elsif defs.respond_to?(:name)
-        defs.name
-      end
-      @_desc  = if defs.respond_to?(:short_description)
-        defs.short_description
-      elsif defs.respond_to?(:description)
-        defs.description
-      end
-      @_keys  = if defs.respond_to?(:tag_list)
-        defs.tag_list
-      elsif defs.respond_to?(:keywords)
-        defs.keywords
-      end
+
+      lookup_method = lambda do |obj, key|
+        methods = obj.class.respond_to?(:sitemapper_config)? obj.class.sitemapper_config : Sitemapper.meta_lookup
+        methods = methods[key]
+        method = if methods.is_a?(Array)
+          methods.find {|m| obj.respond_to?(m)}
+        elsif methods.is_a?(String) || methods.is_a?(Symbol)
+          methods
+        end
+        logger.debug(">>> #{method}")
+        return method.nil?? nil : obj.send(method)
+      end # Do you think it's ugly? You have to see my grandma in underwear
+
+      @_title = lookup_method.call(defs, :title)
+      @_desc  = lookup_method.call(defs, :desc)
+      @_keys  = lookup_method.call(defs, :keywords)
     end
-    alias_method_chain :page, :object
+    alias_method :page_without_object, :page
+    alias_method :page, :page_with_object
 
     # Returns the title of the page with the website title
     #

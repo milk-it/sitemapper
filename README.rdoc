@@ -105,6 +105,22 @@ page title), short_description or description, tag_list or keywords.
 
   <% page(@event) %>
 
+If you need to change the default method lookup for page, you have two ways:
+
+==== Add an initializer with the following content (that will change the default method lookup sequence):
+
+  Sitemapper.meta_lookup = {:title => [:my_default_title_method, :my_second_default_title_method]
+    :desc => [:my_default_description_method, :my_second_default_description_method],
+    :keywords => [:my_default_keywords_method, :my_second_default_keywords_methods]
+  }
+
+==== Configure per object (yes, object, not just ActiveRecord descendents) lookups:
+
+  class MyObject
+    map_fields :title => :weird_title, :desc => :weird_description, :keywords => :weird_keywords
+    ...
+  end
+
 If you want to suggest any other SEO technique, suggest it on
 carlos@milk-it.net
 
@@ -116,6 +132,7 @@ carlos@milk-it.net
  * Create separate files for dynamic and static routes (then, we'll can
    delete all the static on startup)
  * Write test code (sorry, I really didn't it)
+ * Write the Sitemapper::Map#map_urls method
 
 Copyright (c) 2008 Carlos Júnior, released under the MIT license
 Copyright (c) 2008 Milk-it Software House, released under the MIT license
