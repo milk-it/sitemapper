@@ -147,7 +147,6 @@ carlos@milk-it.net
  * Create separate files for dynamic and static routes (then, we'll can
    delete all the static on startup)
  * Write test code (sorry, I really didn't it)
- * Write the Sitemapper::Map#map_urls method
 
 Copyright (c) 2008 Carlos Júnior, released under the MIT license
 Copyright (c) 2008 Milk-it Software House, released under the MIT license
