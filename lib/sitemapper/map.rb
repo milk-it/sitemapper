@@ -9,7 +9,7 @@ module Sitemapper
 
     # Returns the site root (previously defined with site_root=)
     def self.site_root
-      @@site_root || 'http://www.example.com/'
+      @@site_root ||= 'http://www.example.com/' 
     end
 
     # Set the site root for the generated URLs
@@ -26,6 +26,7 @@ module Sitemapper
       @builder = REXML::Document.new(File.exists?(file)? File.read(file) : nil)
       @locker = Mutex.new
       @file = file
+      @write = true
       initialize_map
     end
 
@@ -41,14 +42,8 @@ module Sitemapper
     #
     # See http://www.sitemaps.org/protocol.php
     def map_url(loc, opts={})
-      lastmod, changefreq, priority = extract_options(opts)
       @locker.synchronize do
-        url = get_url(loc) || @builder.root.add_element('url')
-        (url.elements['loc'] || url.add_element('loc')).text = loc
-        (url.elements['lastmod'] || url.add_element('lastmod')).text = lastmod.strftime('%Y-%m-%d') if lastmod
-        (url.elements['changefreq'] || url.add_element('change_freq')).text = changefreq.to_s if changefreq
-        (url.elements['priority'] || url.add_element('priority')).text = '%.2f' % priority if priority
-
+        set_url_node(loc, opts)
         write_file
       end
     end
@@ -61,8 +56,21 @@ module Sitemapper
       map_url(URI.join(Map.site_root, path), opts)
     end
 
-    def map_urls #:nodoc:
-      # TODO: method to add various URLs and just write in the end
+    # Map multiple URLs and write once (at the end)
+    #
+    # Usage:
+    # 
+    #   map.map_urls do |map|
+    #     map.map_url('http://www.example.com/about')
+    #     map.unmap_url('http://www.example.com/contact')
+    #   end
+    #
+    def map_urls
+      @write = false
+      yield(self)
+      @write = true
+
+      @locker.synchronize { write_file }
     end
 
     # Unmap the given localization (<tt>loc</tt>)
@@ -70,9 +78,7 @@ module Sitemapper
     # * <tt>loc</tt> is the URL to be unmaped
     def unmap_url(loc)
       @locker.synchronize do
-        url = get_url(loc)
-        url.remove if url
-
+        unset_url_node(loc)
         write_file
       end
     end
@@ -85,6 +91,20 @@ module Sitemapper
     end
 
     private
+
+    def set_url_node(loc, opts)
+      lastmod, changefreq, priority = extract_options(opts)
+      url = get_url(loc) || @builder.root.add_element('url')
+      (url.elements['loc'] || url.add_element('loc')).text = loc
+      (url.elements['lastmod'] || url.add_element('lastmod')).text = lastmod.strftime('%Y-%m-%d') if lastmod
+      (url.elements['changefreq'] || url.add_element('change_freq')).text = changefreq.to_s if changefreq
+      (url.elements['priority'] || url.add_element('priority')).text = '%.2f' % priority if priority
+    end
+
+    def unset_url_node(loc)
+      url = get_url(loc)
+      url.remove if url
+    end
 
     # Extract the options to map an URL
     #
@@ -104,7 +124,7 @@ module Sitemapper
 
     # Write the file to disk (run only synchronized with @locker)
     def write_file
-      File.open(@file, 'w') {|file| @builder.write(file, INDENT)}
+      File.open(@file, 'w') {|file| @builder.write(file, INDENT)} if @write
     end
 
     # Initialize the map (called on the boot, normally)
