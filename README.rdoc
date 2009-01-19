@@ -68,6 +68,21 @@ You can also do it on your sweepers (which is a better choice)
 Sorry, we do not support Merb yet. (Actually, it will depend on the
 demand)
 
+=== Mapping multiple URLs
+
+If you need to map multiple urls, it's high recommended to use #map_urls, to do so:
+
+  map.map_urls do |map|
+    map.map_url('http://www.example.org/about')
+    ...
+  end
+
+  or, if you are in a Sweeper or Controller
+
+  map_urls do |map|
+   ...
+  end
+
 === Other SEO techniques
 
 With SEO, you'll have some view helpers to easily apply some SEO

@@ -15,5 +15,11 @@ module Sitemapper
     def unmap_path(path)
       Sitemapper::map.unmap_path(path)
     end
+
+    def map_urls
+      Sitemapper::map.map_urls do
+        yield
+      end
+    end
   end
 end
