@@ -21,24 +21,20 @@ module Sitemapper
       return nil # dummies safe!
     end
 
-    def page_with_object(defs) # :nodoc:
-      return page_without_object(defs) if defs.is_a?(Hash)
+    def page_with_object(obj) # :nodoc:
+      obj = begin
+        lookup = Sitemapper.meta_lookup.merge(obj.class.sitemapper_config || {})
+        defs = {}
+        [:title, :desc, :keywords].each do |key|
+          method = lookup[key]
+          method = method.find {|m| obj.respond_to?(m)} if method.is_a?(Array)
 
-      lookup_method = lambda do |obj, key|
-        methods = obj.class.respond_to?(:sitemapper_config)? obj.class.sitemapper_config : Sitemapper.meta_lookup
-        methods = methods[key]
-        method = if methods.is_a?(Array)
-          methods.find {|m| obj.respond_to?(m)}
-        elsif methods.is_a?(String) || methods.is_a?(Symbol)
-          methods
-        end
-        logger.debug(">>> #{method}")
-        return method.nil?? nil : obj.send(method)
-      end # Do you think it's ugly? You have to see my grandma in underwear
+          defs[key] = method.nil?? nil : obj.send(method)
+        end # Do you think it's ugly? You have to see my grandma in underwear
+        defs
+      end unless obj.is_a?(Hash)
 
-      @_title = lookup_method.call(defs, :title)
-      @_desc  = lookup_method.call(defs, :desc)
-      @_keys  = lookup_method.call(defs, :keywords)
+      return page_without_object(obj)
     end
     alias_method :page_without_object, :page
     alias_method :page, :page_with_object

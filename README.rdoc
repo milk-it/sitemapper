@@ -136,10 +136,11 @@ If you need to change the default method lookup for page, you have two ways:
     ...
   end
 
-If you want to suggest any other SEO technique, suggest it on
-carlos@milk-it.net
+If you don't specify all the fields, it'll be merged with the Sitemapper.meta_lookup config.
 
 === Hope you enjoy!
+
+If you want to suggest any other SEO technique, suggest it on carlos@milk-it.net
 
 == To do:
 
