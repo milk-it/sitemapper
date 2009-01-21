@@ -2,4 +2,7 @@ doc
 rdoc
 teste.rb
 sitemap.xml
+*.gz
 *.gem
+*~
+**/*~

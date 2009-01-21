@@ -1,15 +1,17 @@
 $:.unshift(File.dirname(__FILE__))
 require 'sitemapper/helpers'
+require 'sitemapper/sitemap_xml'
 require 'sitemapper/map'
+require 'sitemapper/map_index'
 require 'sitemapper/accessors'
 require 'sitemapper/object_mapper'
 
 module Sitemapper
-  MAJOR, MINOR, TINY = 0, 3, 0 #:nodoc:
+  MAJOR, MINOR, PATCH = 0, 3, 0 #:nodoc:
 
   # Get the running version of Sitemapper
   def self.version
-    [MAJOR, MINOR, TINY].join('.')
+    [MAJOR, MINOR, PATCH].join('.')
   end
 
   def self.map=(map)
@@ -17,7 +19,31 @@ module Sitemapper
   end
 
   def self.map
-    @map or raise 'Uninitialized Sitemapper.map'
+    @map
+  end
+
+  def self.map_index=(index)
+    @map_index = index
+  end
+
+  def self.map_index
+    @map_index
+  end
+    
+  # Returns the site root (previously defined with site_root=)
+  def self.site_root
+    @@site_root ||= 'http://www.example.com/' 
+  end
+
+  # Set the site root for the generated URLs
+  #
+  # * <tt>root</tt> is the root, (ex.: http://www.example.com)
+  def self.site_root=(root)
+    @@site_root = root
+  end
+
+  def self.urlfy(url_or_path)
+    url_or_path =~ /^https?:/ ? url_or_path : URI.join(self.site_root, url_or_path)
   end
 
   # Define the default meta lookup for objects on <tt>page</tt> helper

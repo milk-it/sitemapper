@@ -2,14 +2,15 @@ module Sitemapper
   module Adapters
     module RailsAdapter
       module RoutesMapperExtension
-        include Sitemapper::Accessors
-
         def self.included(base)
           base.class_eval do
             alias_method_chain :named_route, :sitemap
             alias_method_chain :connect, :sitemap
             alias_method_chain :root, :sitemap
           end
+          path = File.join(Rails.root, 'public', 'sitemap_static.xml.gz')
+          File.unlink(path) if File.exists?(path)
+          @@map = Sitemapper::map_index.build_map(path)
         end
 
         def named_route_with_sitemap(name, path, options = {})
@@ -34,7 +35,7 @@ module Sitemapper
           method = options[:conditions][:method] rescue :get
           # TODO: extract options to map
           unless path =~ /[:*]/ || method != :get
-            map_path(path)
+            @@map.map_path(path)
           end
         end
       end
@@ -42,9 +43,10 @@ module Sitemapper
       # Install routing hooks, view helpers and initialize the
       # sitemap.xml file
       def self.install!
-        Sitemapper::Map.site_root = ActionController::Base.relative_url_root rescue
+        Sitemapper::site_root = ActionController::Base.relative_url_root rescue
                                     ActionController::AbstractRequest.relative_url_root
-        Sitemapper::map = Sitemapper::Map.new(File.join(Rails.root, 'public', 'sitemap.xml'))
+        Sitemapper::map_index = Sitemapper::MapIndex.new(File.join(Rails.root, 'public', 'sitemap_index.xml.gz'))
+        Sitemapper::map = Sitemapper::map_index.build_map(File.join(Rails.root, 'public', 'sitemap_dynamic.xml.gz'))
         ActionController::Routing::RouteSet::Mapper.send :include, RoutesMapperExtension
         ActionView::Base.send :include, Sitemapper::Helpers
         ActionController::Base.send :include, Sitemapper::Accessors
