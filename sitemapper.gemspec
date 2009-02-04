@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "sitemapper"
-  s.version = '0.3.1'
+  s.version = '0.3.2'
   s.specification_version = 2 if s.respond_to? :specification_version=
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Carlos Junior"]
@@ -11,7 +11,13 @@ Gem::Specification.new do |s|
   s.files = [
     "README.rdoc", "Rakefile", "MIT-LICENSE", "install.rb", "init.rb", "tasks/sitemaper_tasks.rake",
 
-    "lib/sitemapper.rb", "lib/sitemapper/helpers.rb", "lib/sitemapper/map.rb",
+    "lib/sitemapper.rb",
+    "lib/sitemapper/accessors.rb",
+    "lib/sitemapper/helpers.rb",
+    "lib/sitemapper/map.rb",
+    "lib/sitemapper/sitemap_xml.rb",
+    "lib/sitemapper/map_index.rb",
+    "lib/sitemapper/object_mapper.rb",
     "lib/sitemapper/adapters/rails_adapter.rb"
   ]
   s.has_rdoc = true
